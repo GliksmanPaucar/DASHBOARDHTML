@@ -184,6 +184,9 @@
                 <button onclick="switchTab('cal_tec')" id="btn-cal_tec" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-slate-400 hover:bg-slate-800 hover:text-white transition">
                     <i class="fa-regular fa-calendar-days w-5 text-center text-purple-400"></i> Calendario Técnicos
                 </button>
+                <button onclick="switchTab('reporte_manto')" id="btn-reporte_manto" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-slate-400 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-chart-pie w-5 text-center text-amber-400"></i> Reporte Mantenimiento
+                </button>
                 
                 <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 mt-6 px-4">Configuración</div>
                 <button onclick="switchTab('api')" id="btn-api" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-slate-400 hover:bg-slate-800 hover:text-white transition">
@@ -812,6 +815,170 @@
             </section>
 
             <!-- ========================================== -->
+            <!-- TAB: REPORTE DE MANTENIMIENTO               -->
+            <!-- ========================================== -->
+            <section id="tab-reporte_manto" class="tab-content space-y-6">
+
+                <!-- Filtro de Año y Mes -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0 pb-2 border-b border-slate-200/60 dark:border-slate-700/60 transition-colors">
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">PERIODO:</span>
+                        <select id="rm-year-filter" onchange="renderReporteMantenimiento()" class="text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-md px-3 py-1.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                            <option value="TODOS">Todos los años</option>
+                        </select>
+                        <select id="rm-month-filter" onchange="renderReporteMantenimiento()" class="text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-md px-3 py-1.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                            <option value="TODOS">Todos los meses</option>
+                            <option value="01">Enero</option>
+                            <option value="02">Febrero</option>
+                            <option value="03">Marzo</option>
+                            <option value="04">Abril</option>
+                            <option value="05">Mayo</option>
+                            <option value="06">Junio</option>
+                            <option value="07">Julio</option>
+                            <option value="08">Agosto</option>
+                            <option value="09">Septiembre</option>
+                            <option value="10">Octubre</option>
+                            <option value="11">Noviembre</option>
+                            <option value="12">Diciembre</option>
+                        </select>
+                        <button id="rm-spartan-toggle" onclick="toggleRmSpartan()" type="button" class="text-xs font-bold rounded-md px-3 py-1.5 shadow-sm border transition flex items-center gap-2 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500">
+                            <i class="fa-regular fa-square"></i> SPARTAN CHEMICAL
+                        </button>
+                        <button id="rm-sodexo-toggle" onclick="toggleRmSodexo()" type="button" class="text-xs font-bold rounded-md px-3 py-1.5 shadow-sm border transition flex items-center gap-2 bg-emerald-500 border-emerald-500 text-white">
+                            <i class="fa-solid fa-square-check"></i> SODEXO
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPIs de Mantenimiento -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 shrink-0">
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between relative overflow-hidden">
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-amber-500"></div>
+                        <div class="pl-2 z-10">
+                            <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Mantenimientos</span>
+                            <h3 class="text-3xl font-black text-amber-600 dark:text-amber-500 leading-none mt-1" id="rm-kpi-total">0</h3>
+                            <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400 mt-1.5 block bg-amber-50 dark:bg-amber-900/30 inline-block px-1.5 py-0.5 rounded">Total registrados</span>
+                        </div>
+                        <div class="text-amber-100 dark:text-amber-900/50 text-4xl opacity-50"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between relative overflow-hidden">
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
+                        <div class="pl-2 z-10">
+                            <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Clientes Atendidos</span>
+                            <h3 class="text-3xl font-black text-blue-600 dark:text-blue-500 leading-none mt-1" id="rm-kpi-clientes">0</h3>
+                            <span class="text-[10px] font-bold text-blue-600 dark:text-blue-400 mt-1.5 block bg-blue-50 dark:bg-blue-900/30 inline-block px-1.5 py-0.5 rounded">Clientes únicos</span>
+                        </div>
+                        <div class="text-blue-100 dark:text-blue-900/50 text-4xl opacity-50"><i class="fa-solid fa-building-user"></i></div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between relative overflow-hidden">
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500"></div>
+                        <div class="pl-2 z-10">
+                            <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Horas de Visita</span>
+                            <h3 class="text-3xl font-black text-emerald-600 dark:text-emerald-500 leading-none mt-1" id="rm-kpi-horas">0</h3>
+                            <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 mt-1.5 block bg-emerald-50 dark:bg-emerald-900/30 inline-block px-1.5 py-0.5 rounded">Total acumulado</span>
+                        </div>
+                        <div class="text-emerald-100 dark:text-emerald-900/50 text-4xl opacity-50"><i class="fa-solid fa-clock"></i></div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between relative overflow-hidden">
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-purple-500"></div>
+                        <div class="pl-2 z-10">
+                            <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Prom. Horas/Visita</span>
+                            <h3 class="text-3xl font-black text-purple-600 dark:text-purple-500 leading-none mt-1" id="rm-kpi-promedio">0</h3>
+                            <span class="text-[10px] font-bold text-purple-600 dark:text-purple-400 mt-1.5 block bg-purple-50 dark:bg-purple-900/30 inline-block px-1.5 py-0.5 rounded">Por visita técnica</span>
+                        </div>
+                        <div class="text-purple-100 dark:text-purple-900/50 text-4xl opacity-50"><i class="fa-solid fa-stopwatch"></i></div>
+                    </div>
+                    <div onclick="abrirModalCancelaciones()" class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between relative overflow-hidden cursor-pointer hover:shadow-md hover:border-rose-300 dark:hover:border-rose-700 transition">
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-rose-500"></div>
+                        <div class="pl-2 z-10">
+                            <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Visitas Canceladas</span>
+                            <h3 class="text-3xl font-black text-rose-600 dark:text-rose-500 leading-none mt-1" id="rm-kpi-canceladas">0</h3>
+                            <span class="text-[10px] font-bold text-rose-600 dark:text-rose-400 mt-1.5 block bg-rose-50 dark:bg-rose-900/30 inline-block px-1.5 py-0.5 rounded">Clic para ver detalle</span>
+                        </div>
+                        <div class="text-rose-100 dark:text-rose-900/50 text-4xl opacity-50"><i class="fa-solid fa-calendar-xmark"></i></div>
+                    </div>
+                    <div onclick="abrirModalCumplimiento()" class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between relative overflow-hidden cursor-pointer hover:shadow-md hover:border-cyan-300 dark:hover:border-cyan-700 transition">
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-cyan-500"></div>
+                        <div class="pl-2 z-10">
+                            <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Cumplimiento Visitas</span>
+                            <h3 class="text-3xl font-black text-cyan-600 dark:text-cyan-500 leading-none mt-1" id="rm-kpi-cumplimiento">0%</h3>
+                            <span class="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 mt-1.5 block bg-cyan-50 dark:bg-cyan-900/30 inline-block px-1.5 py-0.5 rounded">Clic para ver detalle</span>
+                        </div>
+                        <div class="text-cyan-100 dark:text-cyan-900/50 text-4xl opacity-50"><i class="fa-solid fa-bullseye"></i></div>
+                    </div>
+                </div>
+
+                <!-- Gráficos -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <h4 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3 flex items-center justify-between gap-2">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-ranking-star text-amber-500"></i> Top 10 Clientes Atendidos <span class="text-[10px] font-normal text-slate-400 dark:text-slate-500 normal-case">(clic en una barra para ver el detalle)</span></span>
+                            <button onclick="abrirModalTodosClientes()" type="button" class="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 hover:bg-amber-100 dark:hover:bg-amber-900/50 px-2.5 py-1 rounded-md transition flex items-center gap-1 normal-case shrink-0">
+                                <i class="fa-solid fa-list"></i> Ver todos
+                            </button>
+                        </h4>
+                        <div style="height: 320px;"><canvas id="rmTopClientesChart"></canvas></div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <h4 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3 flex items-center justify-between gap-2">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-chart-pie text-blue-500"></i> Tipo de Visitas Realizadas</span>
+                            <button onclick="abrirModalTendenciaTipoVisita()" type="button" class="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 px-2.5 py-1 rounded-md transition flex items-center gap-1 normal-case shrink-0">
+                                <i class="fa-solid fa-chart-line"></i> Ver tendencia anual
+                            </button>
+                        </h4>
+                        <div class="flex flex-col sm:flex-row items-center gap-4">
+                            <div style="height: 260px; width: 100%; max-width: 260px;" class="shrink-0"><canvas id="rmTipoMantoChart"></canvas></div>
+                            <div class="w-full overflow-y-auto" style="max-height: 260px;">
+                                <table class="w-full text-xs">
+                                    <thead>
+                                        <tr class="text-left font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                                            <th class="pb-2 pr-2">Tipo</th>
+                                            <th class="pb-2 pr-2 text-center">Cant.</th>
+                                            <th class="pb-2 text-right">%</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="rm-tipomanto-tbody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <h4 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3 flex items-center justify-between gap-2">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-business-time text-emerald-500"></i> Horas de Visita por Cliente (Top 10)</span>
+                            <button onclick="abrirModalTodasHoras()" type="button" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 px-2.5 py-1 rounded-md transition flex items-center gap-1 normal-case shrink-0">
+                                <i class="fa-solid fa-list"></i> Ver todos
+                            </button>
+                        </h4>
+                        <div style="height: 320px;"><canvas id="rmHorasClienteChart"></canvas></div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <h4 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3 flex items-center gap-2"><i class="fa-solid fa-chart-column text-indigo-500"></i> <span id="rmMantoMensualTitle">Visitas por Mes</span></h4>
+                        <div style="height: 320px;"><canvas id="rmMantoMensualChart"></canvas></div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm lg:col-span-2">
+                        <h4 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3 flex items-center justify-between gap-2">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-money-bill-trend-up text-teal-500"></i> Top 10 Clientes con Mayor Consumo (Repuestos + Viático y Mano de Obra) <span class="text-[10px] font-normal text-slate-400 dark:text-slate-500 normal-case">(clic en una barra para ver el detalle)</span></span>
+                            <button onclick="abrirModalTodoConsumo()" type="button" class="text-[10px] font-bold text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/30 hover:bg-teal-100 dark:hover:bg-teal-900/50 px-2.5 py-1 rounded-md transition flex items-center gap-1 normal-case shrink-0">
+                                <i class="fa-solid fa-list"></i> Ver todos
+                            </button>
+                        </h4>
+                        <div style="height: 340px;"><canvas id="rmTopRepuestosChart"></canvas></div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm lg:col-span-2">
+                        <h4 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3 flex items-center justify-between gap-2">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-dolly text-indigo-600"></i> Top 10 Clientes por Inversión en Equipos en Comodato <span class="text-[10px] font-normal text-slate-400 dark:text-slate-500 normal-case">(clic en una barra para ver el detalle)</span></span>
+                            <button onclick="abrirModalTodoComodato()" type="button" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 px-2.5 py-1 rounded-md transition flex items-center gap-1 normal-case shrink-0">
+                                <i class="fa-solid fa-list"></i> Ver todos
+                            </button>
+                        </h4>
+                        <div style="height: 340px;"><canvas id="rmComodatoChart"></canvas></div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ========================================== -->
             <!-- TAB 5: API Y CONFIGURACIÓN                 -->
             <!-- ========================================== -->
             <section id="tab-api" class="tab-content space-y-6">
@@ -934,6 +1101,363 @@ function doGet(e) {
         </div>
     </div>
 
+    <!-- MODAL: DETALLE DE EQUIPOS EN COMODATO POR CLIENTE -->
+    <div id="modal-comodato" class="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col transform scale-95 transition-transform duration-300 border dark:border-slate-700" id="modal-comodato-content">
+            <div class="bg-indigo-600 dark:bg-indigo-700 p-4 flex justify-between items-center text-white shrink-0">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-dolly text-indigo-200"></i>
+                    <h3 class="font-bold text-lg leading-none" id="modal-comodato-cliente">Cliente</h3>
+                </div>
+                <button onclick="cerrarModalComodato()" class="text-indigo-200 hover:text-white transition bg-indigo-700/50 dark:bg-indigo-800/50 hover:bg-indigo-700 dark:hover:bg-indigo-800 w-8 h-8 rounded-full flex items-center justify-center"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto grow">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-left text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                            <th class="pb-2 pr-2">Equipo</th>
+                            <th class="pb-2 pr-2 text-center">Cantidad</th>
+                            <th class="pb-2 pr-2 text-right">Costo Unitario</th>
+                            <th class="pb-2 text-right">Costo Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-comodato-tbody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                    </tbody>
+                    <tfoot>
+                        <tr class="font-bold text-slate-800 dark:text-slate-100 border-t-2 border-slate-300 dark:border-slate-600">
+                            <td class="pt-3" colspan="2">TOTAL</td>
+                            <td class="pt-3 text-right" id="modal-comodato-total-cantidad"></td>
+                            <td class="pt-3 text-right" id="modal-comodato-total-costo"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800 p-4 border-t border-slate-200 dark:border-slate-700 flex justify-end shrink-0">
+                <button onclick="cerrarModalComodato()" class="px-5 py-2 bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg text-sm font-bold shadow-sm transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: DETALLE DE CONSUMO (REPUESTOS + VIÁTICO Y MANO DE OBRA) POR CLIENTE -->
+    <div id="modal-repuestos" class="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col transform scale-95 transition-transform duration-300 border dark:border-slate-700" id="modal-repuestos-content">
+            <div class="bg-teal-600 dark:bg-teal-700 p-4 flex justify-between items-center text-white shrink-0">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-money-bill-trend-up text-teal-200"></i>
+                    <h3 class="font-bold text-lg leading-none" id="modal-repuestos-cliente">Cliente</h3>
+                </div>
+                <button onclick="cerrarModalRepuestos()" class="text-teal-200 hover:text-white transition bg-teal-700/50 dark:bg-teal-800/50 hover:bg-teal-700 dark:hover:bg-teal-800 w-8 h-8 rounded-full flex items-center justify-center"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto grow">
+                <h4 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Repuestos Solicitados</h4>
+                <table class="w-full text-sm mb-5">
+                    <thead>
+                        <tr class="text-left text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                            <th class="pb-2 pr-2">Repuesto</th>
+                            <th class="pb-2 pr-2 text-center">Cantidad</th>
+                            <th class="pb-2 pr-2 text-right">Costo Unitario</th>
+                            <th class="pb-2 text-right">Costo Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-repuestos-tbody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                    </tbody>
+                    <tfoot>
+                        <tr class="font-bold text-slate-800 dark:text-slate-100 border-t-2 border-slate-300 dark:border-slate-600">
+                            <td class="pt-3" colspan="2">Subtotal Repuestos</td>
+                            <td class="pt-3 text-right" id="modal-repuestos-total-cantidad"></td>
+                            <td class="pt-3 text-right" id="modal-repuestos-total-costo"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <h4 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Costos de Visita</h4>
+                <table class="w-full text-sm">
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                        <tr>
+                            <td class="py-2 text-slate-700 dark:text-slate-200 font-medium">Viático</td>
+                            <td class="py-2 text-right text-slate-600 dark:text-slate-300" id="modal-repuestos-viatico"></td>
+                        </tr>
+                        <tr>
+                            <td class="py-2 text-slate-700 dark:text-slate-200 font-medium">Mano de Obra</td>
+                            <td class="py-2 text-right text-slate-600 dark:text-slate-300" id="modal-repuestos-manobra"></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="font-bold text-teal-700 dark:text-teal-400 border-t-2 border-slate-300 dark:border-slate-600 text-base">
+                            <td class="pt-3">TOTAL GENERAL</td>
+                            <td class="pt-3 text-right" id="modal-repuestos-total-general"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800 p-4 border-t border-slate-200 dark:border-slate-700 flex justify-end shrink-0">
+                <button onclick="cerrarModalRepuestos()" class="px-5 py-2 bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg text-sm font-bold shadow-sm transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: TIPOS DE VISITA POR CLIENTE -->
+    <div id="modal-tipovisita" class="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col transform scale-95 transition-transform duration-300 border dark:border-slate-700" id="modal-tipovisita-content">
+            <div class="bg-amber-600 dark:bg-amber-700 p-4 flex justify-between items-center text-white shrink-0">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-ranking-star text-amber-200"></i>
+                    <div>
+                        <h3 class="font-bold text-lg leading-none" id="modal-tipovisita-cliente">Cliente</h3>
+                        <p class="text-xs text-amber-100 mt-1">Tipos de visita — <span id="modal-tipovisita-total">0</span> visitas realizadas</p>
+                    </div>
+                </div>
+                <button onclick="cerrarModalTipoVisita()" class="text-amber-200 hover:text-white transition bg-amber-700/50 dark:bg-amber-800/50 hover:bg-amber-700 dark:hover:bg-amber-800 w-8 h-8 rounded-full flex items-center justify-center shrink-0"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto grow">
+                <div style="height: 260px;"><canvas id="modal-tipovisita-chart"></canvas></div>
+                <table class="w-full text-sm mt-5">
+                    <thead>
+                        <tr class="text-left text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                            <th class="pb-2 pr-2">Tipo de Visita</th>
+                            <th class="pb-2 pr-2 text-center">Cantidad</th>
+                            <th class="pb-2 text-right">Porcentaje</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-tipovisita-tbody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                    </tbody>
+                </table>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800 p-4 border-t border-slate-200 dark:border-slate-700 flex justify-end shrink-0">
+                <button onclick="cerrarModalTipoVisita()" class="px-5 py-2 bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg text-sm font-bold shadow-sm transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: TOP CLIENTES CON MÁS CANCELACIONES -->
+    <div id="modal-cancelaciones" class="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col transform scale-95 transition-transform duration-300 border dark:border-slate-700" id="modal-cancelaciones-content">
+            <div class="bg-rose-600 dark:bg-rose-700 p-4 flex justify-between items-center text-white shrink-0">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-xmark text-rose-200"></i>
+                    <div>
+                        <h3 class="font-bold text-lg leading-none">Top Clientes con Más Cancelaciones</h3>
+                        <p class="text-xs text-rose-100 mt-1"><span id="modal-cancelaciones-total">0</span> visitas canceladas en el período</p>
+                    </div>
+                </div>
+                <button onclick="cerrarModalCancelaciones()" class="text-rose-200 hover:text-white transition bg-rose-700/50 dark:bg-rose-800/50 hover:bg-rose-700 dark:hover:bg-rose-800 w-8 h-8 rounded-full flex items-center justify-center shrink-0"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto grow">
+                <div style="height: 300px;"><canvas id="modal-cancelaciones-chart"></canvas></div>
+                <table class="w-full text-sm mt-5">
+                    <thead>
+                        <tr class="text-left text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                            <th class="pb-2 pr-2">Cliente</th>
+                            <th class="pb-2 pr-2 text-center">Cancelaciones</th>
+                            <th class="pb-2 text-right">Porcentaje</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-cancelaciones-tbody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                    </tbody>
+                </table>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800 p-4 border-t border-slate-200 dark:border-slate-700 flex justify-end shrink-0">
+                <button onclick="cerrarModalCancelaciones()" class="px-5 py-2 bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg text-sm font-bold shadow-sm transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CUMPLIMIENTO DE VISITAS TÉCNICAS -->
+    <div id="modal-cumplimiento" class="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden flex flex-col transform scale-95 transition-transform duration-300 border dark:border-slate-700" id="modal-cumplimiento-content">
+            <div class="bg-cyan-600 dark:bg-cyan-700 p-4 flex justify-between items-center text-white shrink-0">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-bullseye text-cyan-200"></i>
+                    <div>
+                        <h3 class="font-bold text-lg leading-none">Cumplimiento de Visitas Técnicas</h3>
+                        <p class="text-xs text-cyan-100 mt-1"><span id="modal-cumplimiento-realizadas">0</span> de <span id="modal-cumplimiento-esperadas">0</span> meses cumplidos — <span id="modal-cumplimiento-pct">0%</span> de cumplimiento</p>
+                    </div>
+                </div>
+                <button onclick="cerrarModalCumplimiento()" class="text-cyan-200 hover:text-white transition bg-cyan-700/50 dark:bg-cyan-800/50 hover:bg-cyan-700 dark:hover:bg-cyan-800 w-8 h-8 rounded-full flex items-center justify-center shrink-0"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto grow">
+                <div class="mb-5">
+                    <h4 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Tendencia Mensual — <span id="modal-cumplimiento-anio-label">Año</span></h4>
+                    <div style="height: 220px;"><canvas id="modal-cumplimiento-chart"></canvas></div>
+                </div>
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-left text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                            <th class="pb-2 pr-2">Cliente</th>
+                            <th class="pb-2 pr-2">Sede</th>
+                            <th class="pb-2 pr-2 text-center">Frec. (días)</th>
+                            <th class="pb-2 pr-2 text-center">Meses Esperados</th>
+                            <th class="pb-2 pr-2 text-center">Meses Cumplidos</th>
+                            <th class="pb-2 text-right">Cumplimiento</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-cumplimiento-tbody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                    </tbody>
+                </table>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800 p-4 border-t border-slate-200 dark:border-slate-700 flex justify-end shrink-0">
+                <button onclick="cerrarModalCumplimiento()" class="px-5 py-2 bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg text-sm font-bold shadow-sm transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: TENDENCIA ANUAL DE TIPOS DE VISITA -->
+    <div id="modal-tendencia-tipovisita" class="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden flex flex-col transform scale-95 transition-transform duration-300 border dark:border-slate-700" id="modal-tendencia-tipovisita-content">
+            <div class="bg-blue-600 dark:bg-blue-700 p-4 flex justify-between items-center text-white shrink-0">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-chart-line text-blue-200"></i>
+                    <div>
+                        <h3 class="font-bold text-lg leading-none">Tendencia Anual de Tipos de Visita</h3>
+                        <p class="text-xs text-blue-100 mt-1">Año <span id="modal-tendencia-tipovisita-anio">2026</span> — cantidad de visitas realizadas por mes</p>
+                    </div>
+                </div>
+                <button onclick="cerrarModalTendenciaTipoVisita()" class="text-blue-200 hover:text-white transition bg-blue-700/50 dark:bg-blue-800/50 hover:bg-blue-700 dark:hover:bg-blue-800 w-8 h-8 rounded-full flex items-center justify-center shrink-0"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto grow">
+                <div style="height: 340px;"><canvas id="modal-tendencia-tipovisita-chart"></canvas></div>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800 p-4 border-t border-slate-200 dark:border-slate-700 flex justify-end shrink-0">
+                <button onclick="cerrarModalTendenciaTipoVisita()" class="px-5 py-2 bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg text-sm font-bold shadow-sm transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: TODOS LOS CLIENTES ATENDIDOS -->
+    <div id="modal-todos-clientes" class="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-xl max-h-[85vh] overflow-hidden flex flex-col transform scale-95 transition-transform duration-300 border dark:border-slate-700" id="modal-todos-clientes-content">
+            <div class="bg-amber-600 dark:bg-amber-700 p-4 flex justify-between items-center text-white shrink-0">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-list text-amber-200"></i>
+                    <div>
+                        <h3 class="font-bold text-lg leading-none">Todos los Clientes Atendidos</h3>
+                        <p class="text-xs text-amber-100 mt-1"><span id="modal-todos-clientes-total-clientes">0</span> clientes — <span id="modal-todos-clientes-total-visitas">0</span> visitas realizadas en el período</p>
+                    </div>
+                </div>
+                <button onclick="cerrarModalTodosClientes()" class="text-amber-200 hover:text-white transition bg-amber-700/50 dark:bg-amber-800/50 hover:bg-amber-700 dark:hover:bg-amber-800 w-8 h-8 rounded-full flex items-center justify-center shrink-0"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto grow">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-left text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                            <th class="pb-2 pr-2">#</th>
+                            <th class="pb-2 pr-2">Cliente</th>
+                            <th class="pb-2 pr-2 text-center">Visitas</th>
+                            <th class="pb-2 text-right">%</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-todos-clientes-tbody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                    </tbody>
+                </table>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800 p-4 border-t border-slate-200 dark:border-slate-700 flex justify-end shrink-0">
+                <button onclick="cerrarModalTodosClientes()" class="px-5 py-2 bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg text-sm font-bold shadow-sm transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: TODAS LAS HORAS DE VISITA POR CLIENTE -->
+    <div id="modal-todas-horas" class="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-xl max-h-[85vh] overflow-hidden flex flex-col transform scale-95 transition-transform duration-300 border dark:border-slate-700" id="modal-todas-horas-content">
+            <div class="bg-emerald-600 dark:bg-emerald-700 p-4 flex justify-between items-center text-white shrink-0">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-business-time text-emerald-200"></i>
+                    <div>
+                        <h3 class="font-bold text-lg leading-none">Horas de Visita por Cliente</h3>
+                        <p class="text-xs text-emerald-100 mt-1"><span id="modal-todas-horas-total-clientes">0</span> clientes — <span id="modal-todas-horas-total-horas">0h</span> en total</p>
+                    </div>
+                </div>
+                <button onclick="cerrarModalTodasHoras()" class="text-emerald-200 hover:text-white transition bg-emerald-700/50 dark:bg-emerald-800/50 hover:bg-emerald-700 dark:hover:bg-emerald-800 w-8 h-8 rounded-full flex items-center justify-center shrink-0"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto grow">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-left text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                            <th class="pb-2 pr-2">#</th>
+                            <th class="pb-2 pr-2">Cliente</th>
+                            <th class="pb-2 pr-2 text-center">Horas</th>
+                            <th class="pb-2 text-right">%</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-todas-horas-tbody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                    </tbody>
+                </table>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800 p-4 border-t border-slate-200 dark:border-slate-700 flex justify-end shrink-0">
+                <button onclick="cerrarModalTodasHoras()" class="px-5 py-2 bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg text-sm font-bold shadow-sm transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: TODO EL CONSUMO POR CLIENTE -->
+    <div id="modal-todo-consumo" class="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col transform scale-95 transition-transform duration-300 border dark:border-slate-700" id="modal-todo-consumo-content">
+            <div class="bg-teal-600 dark:bg-teal-700 p-4 flex justify-between items-center text-white shrink-0">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-money-bill-trend-up text-teal-200"></i>
+                    <div>
+                        <h3 class="font-bold text-lg leading-none">Consumo por Cliente</h3>
+                        <p class="text-xs text-teal-100 mt-1"><span id="modal-todo-consumo-total-clientes">0</span> clientes — S/ <span id="modal-todo-consumo-total-monto">0</span> en total</p>
+                    </div>
+                </div>
+                <button onclick="cerrarModalTodoConsumo()" class="text-teal-200 hover:text-white transition bg-teal-700/50 dark:bg-teal-800/50 hover:bg-teal-700 dark:hover:bg-teal-800 w-8 h-8 rounded-full flex items-center justify-center shrink-0"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto grow">
+                <p class="text-[10px] text-slate-400 dark:text-slate-500 mb-3">Clic en un cliente para ver el detalle de repuestos, viático y mano de obra.</p>
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-left text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                            <th class="pb-2 pr-2">#</th>
+                            <th class="pb-2 pr-2">Cliente</th>
+                            <th class="pb-2 pr-2 text-right">Repuestos</th>
+                            <th class="pb-2 pr-2 text-right">Viático+M.Obra</th>
+                            <th class="pb-2 text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-todo-consumo-tbody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                    </tbody>
+                </table>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800 p-4 border-t border-slate-200 dark:border-slate-700 flex justify-end shrink-0">
+                <button onclick="cerrarModalTodoConsumo()" class="px-5 py-2 bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg text-sm font-bold shadow-sm transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: TODA LA INVERSION EN COMODATO -->
+    <div id="modal-todo-comodato" class="fixed inset-0 bg-slate-900/60 dark:bg-slate-900/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-xl max-h-[85vh] overflow-hidden flex flex-col transform scale-95 transition-transform duration-300 border dark:border-slate-700" id="modal-todo-comodato-content">
+            <div class="bg-indigo-600 dark:bg-indigo-700 p-4 flex justify-between items-center text-white shrink-0">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-dolly text-indigo-200"></i>
+                    <div>
+                        <h3 class="font-bold text-lg leading-none">Inversión en Equipos en Comodato</h3>
+                        <p class="text-xs text-indigo-100 mt-1"><span id="modal-todo-comodato-total-clientes">0</span> clientes — $ <span id="modal-todo-comodato-total-monto">0</span> en total</p>
+                    </div>
+                </div>
+                <button onclick="cerrarModalTodoComodato()" class="text-indigo-200 hover:text-white transition bg-indigo-700/50 dark:bg-indigo-800/50 hover:bg-indigo-700 dark:hover:bg-indigo-800 w-8 h-8 rounded-full flex items-center justify-center shrink-0"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto grow">
+                <p class="text-[10px] text-slate-400 dark:text-slate-500 mb-3">Clic en un cliente para ver el detalle de equipos, cantidad y costos.</p>
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-left text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                            <th class="pb-2 pr-2">#</th>
+                            <th class="pb-2 pr-2">Cliente</th>
+                            <th class="pb-2 pr-2 text-center">Equipos</th>
+                            <th class="pb-2 text-right">Inversión (USD)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-todo-comodato-tbody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                    </tbody>
+                </table>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800 p-4 border-t border-slate-200 dark:border-slate-700 flex justify-end shrink-0">
+                <button onclick="cerrarModalTodoComodato()" class="px-5 py-2 bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg text-sm font-bold shadow-sm transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- SCRIPT PRINCIPAL -->
     <script>
         function toggleTheme() {
@@ -949,6 +1473,9 @@ function doGet(e) {
             if (cliente && sede) {
                 renderMonthlyVisitsChart(cliente, sede, activeChartYear);
                 renderMonthlyFinancialChart(cliente, sede, activeChartYear);
+            }
+            if (document.getElementById('tab-reporte_manto') && document.getElementById('tab-reporte_manto').classList.contains('active')) {
+                renderReporteMantenimiento();
             }
         }
 
@@ -978,6 +1505,231 @@ function doGet(e) {
         let activeChartYear = dToday.getFullYear();
         let monthlyChartInstance = null; 
         let monthlyFinancialChartInstance = null;
+        let rmTopClientesChartInstance = null;
+        let rmTipoMantoChartInstance = null;
+        let rmHorasClienteChartInstance = null;
+        let rmMantoMensualChartInstance = null;
+        let rmTopRepuestosChartInstance = null;
+        let rmComodatoChartInstance = null;
+        let modalTipoVisitaChartInstance = null;
+        let modalCancelacionesChartInstance = null;
+        let modalCumplimientoChartInstance = null;
+        let modalTendenciaTipoVisitaChartInstance = null;
+        let rmIncludeSpartan = false;
+        const SPARTAN_CLIENTE = 'SPARTAN CHEMICAL PERU SAC';
+        let rmExcludeSodexo = false;
+        const SODEXO_CLIENTE = 'SODEXO';
+
+        function toggleRmSpartan() {
+            rmIncludeSpartan = !rmIncludeSpartan;
+            const btn = document.getElementById('rm-spartan-toggle');
+            const icon = btn.querySelector('i');
+            if (rmIncludeSpartan) {
+                btn.classList.remove('bg-white', 'dark:bg-slate-800', 'border-slate-200', 'dark:border-slate-700', 'text-slate-400', 'dark:text-slate-500');
+                btn.classList.add('bg-amber-500', 'border-amber-500', 'text-white');
+                icon.className = 'fa-solid fa-square-check';
+            } else {
+                btn.classList.remove('bg-amber-500', 'border-amber-500', 'text-white');
+                btn.classList.add('bg-white', 'dark:bg-slate-800', 'border-slate-200', 'dark:border-slate-700', 'text-slate-400', 'dark:text-slate-500');
+                icon.className = 'fa-regular fa-square';
+            }
+            renderReporteMantenimiento();
+        }
+
+        function toggleRmSodexo() {
+            rmExcludeSodexo = !rmExcludeSodexo;
+            const btn = document.getElementById('rm-sodexo-toggle');
+            const icon = btn.querySelector('i');
+            if (!rmExcludeSodexo) {
+                // Visible (estado activo/por defecto)
+                btn.classList.remove('bg-white', 'dark:bg-slate-800', 'border-slate-200', 'dark:border-slate-700', 'text-slate-400', 'dark:text-slate-500');
+                btn.classList.add('bg-emerald-500', 'border-emerald-500', 'text-white');
+                icon.className = 'fa-solid fa-square-check';
+            } else {
+                // Oculto (deseleccionado manualmente)
+                btn.classList.remove('bg-emerald-500', 'border-emerald-500', 'text-white');
+                btn.classList.add('bg-white', 'dark:bg-slate-800', 'border-slate-200', 'dark:border-slate-700', 'text-slate-400', 'dark:text-slate-500');
+                icon.className = 'fa-regular fa-square';
+            }
+            renderReporteMantenimiento();
+        }
+
+        // Función global: determina si una fecha (YYYY-MM-DD) cae dentro del año/mes seleccionados en los filtros de período.
+        // Global para poder usarse tanto en renderReporteMantenimiento() como en los modales de detalle.
+        function periodoCoincide(fecha) {
+            if (!fecha) return false;
+            const yearSel = document.getElementById('rm-year-filter');
+            const monthSel = document.getElementById('rm-month-filter');
+            const yearFilter = yearSel ? yearSel.value : 'TODOS';
+            const monthFilter = monthSel ? monthSel.value : 'TODOS';
+            const okYear = yearFilter === 'TODOS' || fecha.substring(0, 4) === yearFilter;
+            const okMonth = monthFilter === 'TODOS' || fecha.substring(5, 7) === monthFilter;
+            return okYear && okMonth;
+        }
+
+        // Función global: determina si un cliente debe mostrarse según los toggles de SPARTAN CHEMICAL / SODEXO.
+        // Global (no local a renderReporteMantenimiento) para poder usarse también en abrirModalComodato().
+        function clienteVisible(cliente) {
+            if (cliente === SPARTAN_CLIENTE && !rmIncludeSpartan) return false;
+            if (cliente === SODEXO_CLIENTE && rmExcludeSodexo) return false;
+            return true;
+        }
+
+        // Para una sede específica y un año dado, determina en qué meses "debía" visitarse
+        // (proyectando la frecuencia en días desde la primera visita real de ese año) y si en
+        // cada uno de esos meses efectivamente se realizó al menos una visita.
+        function calcularMesesSedeEnAnio(cliente, sede, frecuencia, year, monthFilter) {
+            const visitasAnio = dataProgramacionFull
+                .filter(p => p.cliente === cliente && p.sede === sede && p.estado === 'REALIZADO' && p.fecha && p.fecha.substring(0, 4) === year)
+                .sort((a, b) => a.fecha.localeCompare(b.fecha));
+
+            if (visitasAnio.length === 0) return null; // sin ninguna visita ese año: se excluye ese año para esta sede
+
+            const anchor = new Date(visitasAnio[0].fecha);
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+
+            let inicio, fin;
+            if (monthFilter !== 'TODOS') {
+                inicio = new Date(parseInt(year), parseInt(monthFilter) - 1, 1);
+                fin = new Date(parseInt(year), parseInt(monthFilter), 0);
+            } else {
+                inicio = new Date(parseInt(year), 0, 1);
+                fin = new Date(parseInt(year), 11, 31);
+            }
+            const finEfectivo = fin < hoy ? fin : hoy;
+            if (finEfectivo < inicio) return { esperados: 0, cumplidos: 0 };
+
+            const msFrecuencia = frecuencia * 24 * 60 * 60 * 1000;
+
+            // El cursor arranca EN el anchor (primera visita real del año), sin retroceder antes de
+            // ella: no se penaliza a la sede por meses previos a su primera visita registrada.
+            let cursor = new Date(anchor);
+
+            // Genera los meses "esperados" avanzando de `frecuencia` en `frecuencia` días dentro del período.
+            const mesesEsperadosSet = new Set();
+            while (cursor.getTime() <= finEfectivo.getTime()) {
+                if (cursor.getTime() >= inicio.getTime()) {
+                    const key = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}`;
+                    mesesEsperadosSet.add(key);
+                }
+                cursor = new Date(cursor.getTime() + msFrecuencia);
+            }
+
+            let cumplidos = 0;
+            mesesEsperadosSet.forEach(key => {
+                if (visitasAnio.some(p => p.fecha.substring(0, 7) === key)) cumplidos++;
+            });
+
+            return { esperados: mesesEsperadosSet.size, cumplidos };
+        }
+
+        // Igual que calcularMesesSedeEnAnio, pero devuelve el detalle mes por mes (no solo el total),
+        // para poder graficar la tendencia de cumplimiento mensual de un año específico.
+        function calcularDetalleMensualSede(cliente, sede, frecuencia, year) {
+            const visitasAnio = dataProgramacionFull
+                .filter(p => p.cliente === cliente && p.sede === sede && p.estado === 'REALIZADO' && p.fecha && p.fecha.substring(0, 4) === year)
+                .sort((a, b) => a.fecha.localeCompare(b.fecha));
+
+            if (visitasAnio.length === 0) return [];
+
+            const anchor = new Date(visitasAnio[0].fecha);
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+
+            const inicio = new Date(parseInt(year), 0, 1);
+            const fin = new Date(parseInt(year), 11, 31);
+            const finEfectivo = fin < hoy ? fin : hoy;
+            if (finEfectivo < inicio) return [];
+
+            const msFrecuencia = frecuencia * 24 * 60 * 60 * 1000;
+            let cursor = new Date(anchor);
+
+            const mesesEsperadosSet = new Set();
+            while (cursor.getTime() <= finEfectivo.getTime()) {
+                if (cursor.getTime() >= inicio.getTime()) {
+                    const key = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}`;
+                    mesesEsperadosSet.add(key);
+                }
+                cursor = new Date(cursor.getTime() + msFrecuencia);
+            }
+
+            return Array.from(mesesEsperadosSet).map(key => ({
+                mes: key,
+                cumplida: visitasAnio.some(p => p.fecha.substring(0, 7) === key)
+            }));
+        }
+
+        // Agrega, mes a mes, el % de cumplimiento a través de TODAS las sedes calificadas para un año dado.
+        // Se usa para el gráfico de línea de tendencia mensual dentro del modal de Cumplimiento.
+        function calcularCumplimientoMensualAnio(year) {
+            const sedesConFrecuencia = dataSedesExtendida.filter(s => s.frecuencia > 0 && String(s.dispEquipos || '').trim().toUpperCase() === 'SI' && clienteVisible(s.cliente));
+
+            const porMes = {}; // { 'YYYY-MM': { esperados, cumplidos } }
+            sedesConFrecuencia.forEach(s => {
+                calcularDetalleMensualSede(s.cliente, s.sede, s.frecuencia, year).forEach(d => {
+                    if (!porMes[d.mes]) porMes[d.mes] = { esperados: 0, cumplidos: 0 };
+                    porMes[d.mes].esperados++;
+                    if (d.cumplida) porMes[d.mes].cumplidos++;
+                });
+            });
+
+            return Object.keys(porMes).sort().map(mes => ({
+                mes,
+                esperados: porMes[mes].esperados,
+                cumplidos: porMes[mes].cumplidos,
+                pct: porMes[mes].esperados > 0 ? (porMes[mes].cumplidos / porMes[mes].esperados * 100) : 0
+            }));
+        }
+
+        // Cruza SEDES (frecuencia de visita programada) con PROGRAMACION (visitas REALIZADO):
+        // para cada sede, determina en qué meses debía visitarse según su frecuencia y verifica
+        // mes a mes si la visita se realizó o no, calculando el % de cumplimiento sobre esos meses.
+        function calcularCumplimientoVisitas() {
+            const yearSel = document.getElementById('rm-year-filter');
+            const monthSel = document.getElementById('rm-month-filter');
+            const yearFilter = yearSel ? yearSel.value : 'TODOS';
+            const monthFilter = monthSel ? monthSel.value : 'TODOS';
+
+            // Solo se consideran sedes con DispEquipos = "SI" exactamente (se excluyen "NO", "TERMINO CONTRATO" y vacíos).
+            const sedesConFrecuencia = dataSedesExtendida.filter(s => s.frecuencia > 0 && String(s.dispEquipos || '').trim().toUpperCase() === 'SI' && clienteVisible(s.cliente));
+
+            let totalEsperadas = 0;
+            let totalRealizadas = 0;
+            const detalle = [];
+
+            sedesConFrecuencia.forEach(s => {
+                // Años a evaluar: el seleccionado, o (si "Todos los años") cada año en que la sede tuvo al menos una visita.
+                const years = yearFilter !== 'TODOS'
+                    ? [yearFilter]
+                    : Array.from(new Set(
+                        dataProgramacionFull
+                            .filter(p => p.cliente === s.cliente && p.sede === s.sede && p.estado === 'REALIZADO' && p.fecha)
+                            .map(p => p.fecha.substring(0, 4))
+                    )).sort();
+
+                let esperadosSede = 0;
+                let cumplidosSede = 0;
+                years.forEach(y => {
+                    const r = calcularMesesSedeEnAnio(s.cliente, s.sede, s.frecuencia, y, monthFilter);
+                    if (r) { esperadosSede += r.esperados; cumplidosSede += r.cumplidos; }
+                });
+
+                // Se excluyen sedes sin ningún mes "esperado" evaluable (sin actividad real, o período aún futuro).
+                if (esperadosSede === 0) return;
+
+                const pct = Math.min(100, (cumplidosSede / esperadosSede * 100));
+
+                totalEsperadas += esperadosSede;
+                totalRealizadas += cumplidosSede;
+                detalle.push({ cliente: s.cliente, sede: s.sede, frecuencia: s.frecuencia, esperadas: esperadosSede, realizadas: cumplidosSede, pct });
+            });
+
+            const pctGeneral = totalEsperadas > 0 ? Math.min(100, (totalRealizadas / totalEsperadas * 100)) : 0;
+            detalle.sort((a, b) => a.pct - b.pct);
+
+            return { pctGeneral, totalEsperadas, totalRealizadas, detalle };
+        }
         
         function formatTimeVal(val) {
             if (!val) return "";
@@ -1046,7 +1798,7 @@ function doGet(e) {
 
                 dataEquiposFull = [];
                 equiposRaw.forEach(row => {
-                    const eqRef = String(getVal(row, ['NOMBRE DE EQUIPO', 'Nombre de Equipo', 'NOMBRE_DE_EQUIPO', 'Nombre_de_Equipo', 'EQUIPO', 'Equipo', 'ID']) || "").trim().toUpperCase();
+                    const eqRef = String(getVal(row, ['NOMBRE EQUIPO', 'NOMBRE DE EQUIPO', 'Nombre Equipo', 'Nombre de Equipo', 'NOMBRE_DE_EQUIPO', 'Nombre_de_Equipo', 'EQUIPO', 'Equipo', 'ID']) || "").trim().toUpperCase();
                     const costoC = parseFloat(String(getVal(row, ['COSTOCOMODATO', 'Costocomodato', 'Costo']) || "0").replace(/[^0-9.]/g, '')) || 0;
                     dataEquiposFull.push({
                         equipo: eqRef,
@@ -1067,6 +1819,7 @@ function doGet(e) {
                         cliente: clienteStr,
                         sede: sedeStr,
                         frecuencia: frec,
+                        dispEquipos: disp,
                         tipo: String(getVal(row, ['TIPO']) || "INDUSTRIAL").trim().toUpperCase(),
                         ubicacion: String(getVal(row, ['UbicaSedes', 'Ubicacion']) || "").trim(),
                         contactoNombre: String(getVal(row, ['ContactoNombre', 'CONTACTO NOMBRE', 'contacto_nombre', 'Contacto']) || "").trim(),
@@ -1135,7 +1888,8 @@ function doGet(e) {
                         fecha: fLimpia,
                         equipoId: String(getVal(row, ['EQUIPO ID', 'EQUIPOID', 'Equipo', 'IDENEQUIPO']) || "-").trim(),
                         tipoTrabajo: String(getVal(row, ['TIPO MANTENIMIENTO', 'TIPO_MANTENIMIENTO']) || "-").trim(),
-                        estadoFinal: String(getVal(row, ['ESTADO FINAL', 'ESTADO_FINAL']) || "-").trim()
+                        estadoFinal: String(getVal(row, ['ESTADO FINAL', 'ESTADO_FINAL']) || "-").trim(),
+                        tecnico: String(getVal(row, ['TECNICO', 'Tecnico']) || "Sin asignar").trim()
                     });
                 });
 
@@ -1187,6 +1941,7 @@ function doGet(e) {
                 detReqRaw.forEach(row => {
                     dataDetalleReqFull.push({
                         idReq: String(getVal(row, ['IDREQ', 'IdReq', 'ID_REQ']) || "").trim(),
+                        producto: String(getVal(row, ['PRODUCTO', 'Producto', 'CODIGO', 'Codigo']) || "Sin especificar").trim(),
                         costoUnitario: parseFloat(String(getVal(row, ['COSTO UNITARIO', 'Costo Unitario', 'COSTO']) || "0").replace(/[^0-9.-]+/g, "")) || 0,
                         cantidad: parseFloat(String(getVal(row, ['CANTIDAD', 'Cantidad']) || "1").replace(/[^0-9.-]+/g, "")) || 1
                     });
@@ -2236,6 +2991,597 @@ function doGet(e) {
             setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
         }
 
+        function abrirModalComodato(cliente) {
+            const equiposCliente = dataComodatoFull.filter(c => c.cliente === cliente && clienteVisible(c.cliente));
+
+            const porEquipo = {}; // { equipoRef: { cantidad, costoUnitario } }
+            equiposCliente.forEach(c => {
+                const key = c.equipoRef || 'SIN ESPECIFICAR';
+                if (!porEquipo[key]) porEquipo[key] = { cantidad: 0, costoUnitario: c.costo || 0 };
+                porEquipo[key].cantidad += 1;
+            });
+
+            const filas = Object.entries(porEquipo)
+                .map(([equipo, v]) => ({ equipo, cantidad: v.cantidad, costoUnitario: v.costoUnitario, costoTotal: v.cantidad * v.costoUnitario }))
+                .sort((a, b) => b.costoTotal - a.costoTotal);
+
+            const tbody = document.getElementById('modal-comodato-tbody');
+            tbody.innerHTML = filas.map(f => `
+                <tr>
+                    <td class="py-2 pr-2 text-slate-700 dark:text-slate-200 font-medium">${f.equipo}</td>
+                    <td class="py-2 pr-2 text-center text-slate-600 dark:text-slate-300">${f.cantidad}</td>
+                    <td class="py-2 pr-2 text-right text-slate-600 dark:text-slate-300">$ ${f.costoUnitario.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="py-2 text-right text-slate-800 dark:text-slate-100 font-semibold">$ ${f.costoTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                </tr>
+            `).join('');
+
+            const totalCantidad = filas.reduce((s, f) => s + f.cantidad, 0);
+            const totalCosto = filas.reduce((s, f) => s + f.costoTotal, 0);
+            document.getElementById('modal-comodato-total-cantidad').innerText = totalCantidad;
+            document.getElementById('modal-comodato-total-costo').innerText = `$ ${totalCosto.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('modal-comodato-cliente').innerText = cliente;
+
+            const modal = document.getElementById('modal-comodato');
+            const content = document.getElementById('modal-comodato-content');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        }
+
+        function cerrarModalComodato() {
+            const modal = document.getElementById('modal-comodato');
+            const content = document.getElementById('modal-comodato-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+        }
+
+        function abrirModalRepuestos(cliente) {
+            const reqCliente = dataRequerimientoFull.filter(r => r.cliente === cliente && periodoCoincide(r.fecha) && clienteVisible(r.cliente));
+
+            const porProducto = {}; // { producto: { cantidad, costoUnitario } }
+            let viaticoTotal = 0;
+            let manoObraTotal = 0;
+
+            reqCliente.forEach(req => {
+                const detalles = dataDetalleReqFull.filter(d => d.idReq === req.idReq);
+                detalles.forEach(d => {
+                    const key = d.producto || 'Sin especificar';
+                    if (!porProducto[key]) porProducto[key] = { cantidad: 0, costoUnitario: d.costoUnitario || 0 };
+                    porProducto[key].cantidad += d.cantidad;
+                    if (d.costoUnitario) porProducto[key].costoUnitario = d.costoUnitario;
+                });
+
+                const sedeInfo = dataSedesExtendida.find(s => s.cliente === cliente && s.sede === req.sede);
+                if (sedeInfo) {
+                    viaticoTotal += (sedeInfo.viatico || 0);
+                    manoObraTotal += (sedeInfo.manObra || 0);
+                }
+            });
+
+            const filas = Object.entries(porProducto)
+                .map(([producto, v]) => ({ producto, cantidad: v.cantidad, costoUnitario: v.costoUnitario, costoTotal: v.cantidad * v.costoUnitario }))
+                .sort((a, b) => b.costoTotal - a.costoTotal);
+
+            const tbody = document.getElementById('modal-repuestos-tbody');
+            tbody.innerHTML = filas.map(f => `
+                <tr>
+                    <td class="py-2 pr-2 text-slate-700 dark:text-slate-200 font-medium">${f.producto}</td>
+                    <td class="py-2 pr-2 text-center text-slate-600 dark:text-slate-300">${f.cantidad}</td>
+                    <td class="py-2 pr-2 text-right text-slate-600 dark:text-slate-300">S/ ${f.costoUnitario.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="py-2 text-right text-slate-800 dark:text-slate-100 font-semibold">S/ ${f.costoTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                </tr>
+            `).join('') || `<tr><td colspan="4" class="py-4 text-center text-slate-400 dark:text-slate-500">No hay repuestos registrados en este período.</td></tr>`;
+
+            const totalCantidad = filas.reduce((s, f) => s + f.cantidad, 0);
+            const totalRepuestos = filas.reduce((s, f) => s + f.costoTotal, 0);
+            const totalGeneral = totalRepuestos + viaticoTotal + manoObraTotal;
+
+            document.getElementById('modal-repuestos-total-cantidad').innerText = totalCantidad;
+            document.getElementById('modal-repuestos-total-costo').innerText = `S/ ${totalRepuestos.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('modal-repuestos-viatico').innerText = `S/ ${viaticoTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('modal-repuestos-manobra').innerText = `S/ ${manoObraTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('modal-repuestos-total-general').innerText = `S/ ${totalGeneral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('modal-repuestos-cliente').innerText = cliente;
+
+            const modal = document.getElementById('modal-repuestos');
+            const content = document.getElementById('modal-repuestos-content');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        }
+
+        function cerrarModalRepuestos() {
+            const modal = document.getElementById('modal-repuestos');
+            const content = document.getElementById('modal-repuestos-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+        }
+
+        function abrirModalTipoVisita(cliente) {
+            const registros = dataProgramacionFull.filter(p => p.estado === 'REALIZADO' && p.cliente === cliente && periodoCoincide(p.fecha) && clienteVisible(p.cliente));
+
+            const conteo = {};
+            registros.forEach(p => { const t = p.tipoVisita || 'SIN ESPECIFICAR'; conteo[t] = (conteo[t] || 0) + 1; });
+            const total = registros.length;
+            const items = Object.entries(conteo)
+                .sort((a, b) => b[1] - a[1])
+                .map(([tipo, cantidad]) => ({ tipo, cantidad, pct: total > 0 ? (cantidad / total * 100) : 0 }));
+
+            document.getElementById('modal-tipovisita-cliente').innerText = cliente;
+            document.getElementById('modal-tipovisita-total').innerText = total;
+
+            const tbody = document.getElementById('modal-tipovisita-tbody');
+            tbody.innerHTML = items.map(it => `
+                <tr>
+                    <td class="py-2 pr-2 text-slate-700 dark:text-slate-200 font-medium">${it.tipo}</td>
+                    <td class="py-2 pr-2 text-center text-slate-600 dark:text-slate-300">${it.cantidad}</td>
+                    <td class="py-2 text-right text-slate-800 dark:text-slate-100 font-semibold">${it.pct.toFixed(1)}%</td>
+                </tr>
+            `).join('') || `<tr><td colspan="3" class="py-4 text-center text-slate-400 dark:text-slate-500">Sin visitas registradas en este período.</td></tr>`;
+
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#cbd5e1' : '#475569';
+            const palette = ['#2b6cb0', '#d69e2e', '#38a169', '#805ad5', '#e53e3e', '#0891b2', '#db2777', '#65a30d', '#ea580c', '#4338ca'];
+
+            if (modalTipoVisitaChartInstance) modalTipoVisitaChartInstance.destroy();
+            modalTipoVisitaChartInstance = new Chart(document.getElementById('modal-tipovisita-chart'), {
+                type: 'doughnut',
+                data: {
+                    labels: items.map(it => it.tipo),
+                    datasets: [{ data: items.map(it => it.cantidad), backgroundColor: palette, borderColor: isDark ? '#1e293b' : '#ffffff', borderWidth: 2 }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: textColor, font: { size: 10 }, boxWidth: 12, padding: 10 } },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => {
+                                    const pct = total > 0 ? (ctx.raw / total * 100).toFixed(1) : 0;
+                                    return `${ctx.label}: ${ctx.raw} (${pct}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const modal = document.getElementById('modal-tipovisita');
+            const content = document.getElementById('modal-tipovisita-content');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        }
+
+        function cerrarModalTipoVisita() {
+            const modal = document.getElementById('modal-tipovisita');
+            const content = document.getElementById('modal-tipovisita-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+        }
+
+        function abrirModalCancelaciones() {
+            const registros = dataProgramacionFull.filter(p => p.estado === 'CANCELADO' && periodoCoincide(p.fecha) && clienteVisible(p.cliente));
+
+            const conteo = {};
+            registros.forEach(p => { if (p.cliente) conteo[p.cliente] = (conteo[p.cliente] || 0) + 1; });
+            const total = registros.length;
+            const items = Object.entries(conteo)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10)
+                .map(([cliente, cantidad]) => ({ cliente, cantidad, pct: total > 0 ? (cantidad / total * 100) : 0 }));
+
+            document.getElementById('modal-cancelaciones-total').innerText = total;
+
+            const tbody = document.getElementById('modal-cancelaciones-tbody');
+            tbody.innerHTML = items.map(it => `
+                <tr>
+                    <td class="py-2 pr-2 text-slate-700 dark:text-slate-200 font-medium">${it.cliente}</td>
+                    <td class="py-2 pr-2 text-center text-slate-600 dark:text-slate-300">${it.cantidad}</td>
+                    <td class="py-2 text-right text-slate-800 dark:text-slate-100 font-semibold">${it.pct.toFixed(1)}%</td>
+                </tr>
+            `).join('') || `<tr><td colspan="3" class="py-4 text-center text-slate-400 dark:text-slate-500">Sin cancelaciones registradas en este período.</td></tr>`;
+
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#cbd5e1' : '#475569';
+            const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+
+            if (modalCancelacionesChartInstance) modalCancelacionesChartInstance.destroy();
+            modalCancelacionesChartInstance = new Chart(document.getElementById('modal-cancelaciones-chart'), {
+                type: 'bar',
+                data: {
+                    labels: items.map(it => it.cliente),
+                    datasets: [{ label: 'Cancelaciones', data: items.map(it => it.cantidad), backgroundColor: '#e11d48', borderRadius: 4 }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => {
+                                    const pct = total > 0 ? (ctx.raw / total * 100).toFixed(1) : 0;
+                                    return `Cancelaciones: ${ctx.raw} (${pct}%)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor, stepSize: 1, font: { size: 10 } } },
+                        y: { grid: { display: false }, ticks: { color: textColor, font: { size: 10, weight: 'bold' } } }
+                    }
+                }
+            });
+
+            const modal = document.getElementById('modal-cancelaciones');
+            const content = document.getElementById('modal-cancelaciones-content');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        }
+
+        function cerrarModalCancelaciones() {
+            const modal = document.getElementById('modal-cancelaciones');
+            const content = document.getElementById('modal-cancelaciones-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+        }
+
+        function abrirModalCumplimiento() {
+            const resultado = calcularCumplimientoVisitas();
+
+            document.getElementById('modal-cumplimiento-realizadas').innerText = resultado.totalRealizadas;
+            document.getElementById('modal-cumplimiento-esperadas').innerText = resultado.totalEsperadas;
+            document.getElementById('modal-cumplimiento-pct').innerText = resultado.pctGeneral.toFixed(0) + '%';
+
+            // Año a graficar en la tendencia mensual: el seleccionado en el filtro, o el año actual si está en "Todos".
+            const yearSel = document.getElementById('rm-year-filter');
+            const yearFilter = yearSel ? yearSel.value : 'TODOS';
+            const yearGrafico = yearFilter !== 'TODOS' ? yearFilter : String(new Date().getFullYear());
+            document.getElementById('modal-cumplimiento-anio-label').innerText = yearGrafico;
+
+            const mesesNombres = { '01': 'Ene', '02': 'Feb', '03': 'Mar', '04': 'Abr', '05': 'May', '06': 'Jun', '07': 'Jul', '08': 'Ago', '09': 'Sep', '10': 'Oct', '11': 'Nov', '12': 'Dic' };
+            const tendenciaMensual = calcularCumplimientoMensualAnio(yearGrafico);
+
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#cbd5e1' : '#475569';
+            const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+
+            if (modalCumplimientoChartInstance) modalCumplimientoChartInstance.destroy();
+            modalCumplimientoChartInstance = new Chart(document.getElementById('modal-cumplimiento-chart'), {
+                type: 'line',
+                data: {
+                    labels: tendenciaMensual.map(m => mesesNombres[m.mes.substring(5, 7)]),
+                    datasets: [{
+                        label: '% Cumplimiento',
+                        data: tendenciaMensual.map(m => Number(m.pct.toFixed(1))),
+                        borderColor: '#0891b2',
+                        backgroundColor: 'rgba(8,145,178,0.15)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                        pointBackgroundColor: '#0891b2',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => {
+                                    const m = tendenciaMensual[ctx.dataIndex];
+                                    return `${ctx.raw}% (${m.cumplidos} de ${m.esperados} meses)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { min: 0, max: 100, grid: { color: gridColor }, ticks: { color: textColor, font: { size: 10 }, callback: (v) => v + '%' } },
+                        x: { grid: { display: false }, ticks: { color: textColor, font: { size: 10, weight: 'bold' } } }
+                    }
+                }
+            });
+
+            const colorPct = (pct) => {
+                if (pct >= 90) return 'text-emerald-600 dark:text-emerald-400';
+                if (pct >= 60) return 'text-amber-600 dark:text-amber-400';
+                return 'text-rose-600 dark:text-rose-400';
+            };
+
+            const tbody = document.getElementById('modal-cumplimiento-tbody');
+            tbody.innerHTML = resultado.detalle.map(d => `
+                <tr>
+                    <td class="py-2 pr-2 text-slate-700 dark:text-slate-200 font-medium">${d.cliente}</td>
+                    <td class="py-2 pr-2 text-slate-600 dark:text-slate-300">${d.sede}</td>
+                    <td class="py-2 pr-2 text-center text-slate-600 dark:text-slate-300">${d.frecuencia}</td>
+                    <td class="py-2 pr-2 text-center text-slate-600 dark:text-slate-300">${d.esperadas}</td>
+                    <td class="py-2 pr-2 text-center text-slate-600 dark:text-slate-300">${d.realizadas}</td>
+                    <td class="py-2 text-right font-bold ${colorPct(d.pct)}">${d.pct.toFixed(0)}%</td>
+                </tr>
+            `).join('') || `<tr><td colspan="6" class="py-4 text-center text-slate-400 dark:text-slate-500">No hay sedes con frecuencia de visita registrada.</td></tr>`;
+
+            const modal = document.getElementById('modal-cumplimiento');
+            const content = document.getElementById('modal-cumplimiento-content');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        }
+
+        function cerrarModalCumplimiento() {
+            const modal = document.getElementById('modal-cumplimiento');
+            const content = document.getElementById('modal-cumplimiento-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+        }
+
+        function abrirModalTendenciaTipoVisita() {
+            // Usa el año seleccionado en el filtro de período; si está en "Todos los años", usa el año actual.
+            const yearSel = document.getElementById('rm-year-filter');
+            const yearFilter = yearSel ? yearSel.value : 'TODOS';
+            const yearActual = yearFilter !== 'TODOS' ? yearFilter : String(new Date().getFullYear());
+            document.getElementById('modal-tendencia-tipovisita-anio').innerText = yearActual;
+
+            const registros = dataProgramacionFull.filter(p =>
+                p.estado === 'REALIZADO' && p.fecha && p.fecha.substring(0, 4) === yearActual && clienteVisible(p.cliente)
+            );
+
+            // Agrupa por tipo de visita, contando cuántas hubo cada mes (Ene-Dic) del año en curso.
+            const tipos = {}; // { tipo: [conteo por mes, 12 posiciones] }
+            registros.forEach(p => {
+                const tipo = p.tipoVisita || 'SIN ESPECIFICAR';
+                const mesIdx = parseInt(p.fecha.substring(5, 7)) - 1;
+                if (!tipos[tipo]) tipos[tipo] = Array(12).fill(0);
+                if (mesIdx >= 0 && mesIdx < 12) tipos[tipo][mesIdx]++;
+            });
+
+            const mesesLabels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+            const palette = ['#2b6cb0', '#d69e2e', '#38a169', '#805ad5', '#e53e3e', '#0891b2', '#db2777', '#65a30d', '#ea580c', '#4338ca'];
+
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#cbd5e1' : '#475569';
+            const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+
+            const datasets = Object.keys(tipos).sort().map((tipo, i) => ({
+                label: tipo,
+                data: tipos[tipo],
+                borderColor: palette[i % palette.length],
+                backgroundColor: palette[i % palette.length],
+                borderWidth: 2,
+                tension: 0.3,
+                pointRadius: 3,
+                pointHoverRadius: 5,
+                fill: false
+            }));
+
+            if (modalTendenciaTipoVisitaChartInstance) modalTendenciaTipoVisitaChartInstance.destroy();
+            modalTendenciaTipoVisitaChartInstance = new Chart(document.getElementById('modal-tendencia-tipovisita-chart'), {
+                type: 'line',
+                data: { labels: mesesLabels, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: textColor, font: { size: 10 }, boxWidth: 12, padding: 10 } },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor, stepSize: 1, font: { size: 10 } } },
+                        x: { grid: { display: false }, ticks: { color: textColor, font: { size: 10, weight: 'bold' } } }
+                    }
+                }
+            });
+
+            const modal = document.getElementById('modal-tendencia-tipovisita');
+            const content = document.getElementById('modal-tendencia-tipovisita-content');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        }
+
+        function cerrarModalTendenciaTipoVisita() {
+            const modal = document.getElementById('modal-tendencia-tipovisita');
+            const content = document.getElementById('modal-tendencia-tipovisita-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+        }
+
+        function abrirModalTodosClientes() {
+            const registros = dataProgramacionFull.filter(p =>
+                p.estado === 'REALIZADO' && periodoCoincide(p.fecha) && clienteVisible(p.cliente)
+            );
+
+            const conteo = {};
+            registros.forEach(p => { if (p.cliente) conteo[p.cliente] = (conteo[p.cliente] || 0) + 1; });
+            const total = registros.length;
+            const items = Object.entries(conteo).sort((a, b) => b[1] - a[1]);
+
+            document.getElementById('modal-todos-clientes-total-clientes').innerText = items.length;
+            document.getElementById('modal-todos-clientes-total-visitas').innerText = total;
+
+            const tbody = document.getElementById('modal-todos-clientes-tbody');
+            tbody.innerHTML = items.map((item, i) => {
+                const [cliente, cantidad] = item;
+                const pct = total > 0 ? (cantidad / total * 100) : 0;
+                return `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition" onclick="cerrarModalTodosClientes(); setTimeout(() => abrirModalTipoVisita('${cliente.replace(/'/g, "\\'")}'), 320);">
+                        <td class="py-2 pr-2 text-slate-400 dark:text-slate-500">${i + 1}</td>
+                        <td class="py-2 pr-2 text-slate-700 dark:text-slate-200 font-medium">${cliente}</td>
+                        <td class="py-2 pr-2 text-center text-slate-600 dark:text-slate-300">${cantidad}</td>
+                        <td class="py-2 text-right text-slate-800 dark:text-slate-100 font-semibold">${pct.toFixed(1)}%</td>
+                    </tr>
+                `;
+            }).join('') || `<tr><td colspan="4" class="py-4 text-center text-slate-400 dark:text-slate-500">Sin visitas registradas en este período.</td></tr>`;
+
+            const modal = document.getElementById('modal-todos-clientes');
+            const content = document.getElementById('modal-todos-clientes-content');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        }
+
+        function cerrarModalTodosClientes() {
+            const modal = document.getElementById('modal-todos-clientes');
+            const content = document.getElementById('modal-todos-clientes-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+        }
+
+        function abrirModalTodasHoras() {
+            const registros = dataProgramacionFull.filter(p =>
+                p.estado === 'REALIZADO' && periodoCoincide(p.fecha) && clienteVisible(p.cliente)
+            );
+
+            const horasPorCliente = {};
+            registros.forEach(p => {
+                const horas = calcularDuracionHoras(p.fecha, p.horaInicio, p.fechaFin, p.horaFin);
+                if (horas === null) return;
+                horasPorCliente[p.cliente] = (horasPorCliente[p.cliente] || 0) + horas;
+            });
+
+            const items = Object.entries(horasPorCliente).sort((a, b) => b[1] - a[1]);
+            const totalHoras = items.reduce((s, i) => s + i[1], 0);
+
+            document.getElementById('modal-todas-horas-total-clientes').innerText = items.length;
+            document.getElementById('modal-todas-horas-total-horas').innerText = totalHoras.toFixed(0) + 'h';
+
+            const tbody = document.getElementById('modal-todas-horas-tbody');
+            tbody.innerHTML = items.map((item, i) => {
+                const [cliente, horas] = item;
+                const pct = totalHoras > 0 ? (horas / totalHoras * 100) : 0;
+                return `
+                    <tr>
+                        <td class="py-2 pr-2 text-slate-400 dark:text-slate-500">${i + 1}</td>
+                        <td class="py-2 pr-2 text-slate-700 dark:text-slate-200 font-medium">${cliente}</td>
+                        <td class="py-2 pr-2 text-center text-slate-600 dark:text-slate-300">${horas.toFixed(1)}h</td>
+                        <td class="py-2 text-right text-slate-800 dark:text-slate-100 font-semibold">${pct.toFixed(1)}%</td>
+                    </tr>
+                `;
+            }).join('') || `<tr><td colspan="4" class="py-4 text-center text-slate-400 dark:text-slate-500">Sin horas de visita registradas en este período.</td></tr>`;
+
+            const modal = document.getElementById('modal-todas-horas');
+            const content = document.getElementById('modal-todas-horas-content');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        }
+
+        function cerrarModalTodasHoras() {
+            const modal = document.getElementById('modal-todas-horas');
+            const content = document.getElementById('modal-todas-horas-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+        }
+
+        function abrirModalTodoConsumo() {
+            const reqFiltrados = dataRequerimientoFull.filter(r => periodoCoincide(r.fecha) && clienteVisible(r.cliente));
+            const consumoPorCliente = {};
+            reqFiltrados.forEach(req => {
+                if (!req.cliente) return;
+                const detalles = dataDetalleReqFull.filter(d => d.idReq === req.idReq);
+                const costoRepuestos = detalles.reduce((sum, d) => sum + (d.costoUnitario * d.cantidad), 0);
+                const sedeInfo = dataSedesExtendida.find(s => s.cliente === req.cliente && s.sede === req.sede);
+                const costoVisita = sedeInfo ? ((sedeInfo.manObra || 0) + (sedeInfo.viatico || 0)) : 0;
+
+                if (!consumoPorCliente[req.cliente]) consumoPorCliente[req.cliente] = { repuestos: 0, costoVisitas: 0 };
+                consumoPorCliente[req.cliente].repuestos += costoRepuestos;
+                consumoPorCliente[req.cliente].costoVisitas += costoVisita;
+            });
+
+            const items = Object.entries(consumoPorCliente)
+                .map(([cliente, v]) => ({ cliente, repuestos: v.repuestos, costoVisitas: v.costoVisitas, total: v.repuestos + v.costoVisitas }))
+                .sort((a, b) => b.total - a.total);
+
+            const totalGeneral = items.reduce((s, i) => s + i.total, 0);
+
+            document.getElementById('modal-todo-consumo-total-clientes').innerText = items.length;
+            document.getElementById('modal-todo-consumo-total-monto').innerText = totalGeneral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            const tbody = document.getElementById('modal-todo-consumo-tbody');
+            tbody.innerHTML = items.map((it, i) => `
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition" onclick="cerrarModalTodoConsumo(); setTimeout(() => abrirModalRepuestos('${it.cliente.replace(/'/g, "\\'")}'), 320);">
+                    <td class="py-2 pr-2 text-slate-400 dark:text-slate-500">${i + 1}</td>
+                    <td class="py-2 pr-2 text-slate-700 dark:text-slate-200 font-medium">${it.cliente}</td>
+                    <td class="py-2 pr-2 text-right text-slate-600 dark:text-slate-300">S/ ${it.repuestos.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="py-2 pr-2 text-right text-slate-600 dark:text-slate-300">S/ ${it.costoVisitas.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="py-2 text-right text-slate-800 dark:text-slate-100 font-semibold">S/ ${it.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                </tr>
+            `).join('') || `<tr><td colspan="5" class="py-4 text-center text-slate-400 dark:text-slate-500">Sin consumo registrado en este período.</td></tr>`;
+
+            const modal = document.getElementById('modal-todo-consumo');
+            const content = document.getElementById('modal-todo-consumo-content');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        }
+
+        function cerrarModalTodoConsumo() {
+            const modal = document.getElementById('modal-todo-consumo');
+            const content = document.getElementById('modal-todo-consumo-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+        }
+
+        function abrirModalTodoComodato() {
+            const comodatoFiltrado = dataComodatoFull.filter(c => clienteVisible(c.cliente));
+            const comodatoPorCliente = {};
+            comodatoFiltrado.forEach(c => {
+                if (!c.cliente) return;
+                if (!comodatoPorCliente[c.cliente]) comodatoPorCliente[c.cliente] = { cantidad: 0, costoTotal: 0 };
+                comodatoPorCliente[c.cliente].cantidad += 1;
+                comodatoPorCliente[c.cliente].costoTotal += (c.costo || 0);
+            });
+
+            const items = Object.entries(comodatoPorCliente)
+                .map(([cliente, v]) => ({ cliente, cantidad: v.cantidad, costoTotal: v.costoTotal }))
+                .sort((a, b) => b.costoTotal - a.costoTotal);
+
+            const totalGeneral = items.reduce((s, i) => s + i.costoTotal, 0);
+
+            document.getElementById('modal-todo-comodato-total-clientes').innerText = items.length;
+            document.getElementById('modal-todo-comodato-total-monto').innerText = totalGeneral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            const tbody = document.getElementById('modal-todo-comodato-tbody');
+            tbody.innerHTML = items.map((it, i) => `
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition" onclick="cerrarModalTodoComodato(); setTimeout(() => abrirModalComodato('${it.cliente.replace(/'/g, "\\'")}'), 320);">
+                    <td class="py-2 pr-2 text-slate-400 dark:text-slate-500">${i + 1}</td>
+                    <td class="py-2 pr-2 text-slate-700 dark:text-slate-200 font-medium">${it.cliente}</td>
+                    <td class="py-2 pr-2 text-center text-slate-600 dark:text-slate-300">${it.cantidad}</td>
+                    <td class="py-2 text-right text-slate-800 dark:text-slate-100 font-semibold">$ ${it.costoTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                </tr>
+            `).join('') || `<tr><td colspan="4" class="py-4 text-center text-slate-400 dark:text-slate-500">Sin equipos en comodato registrados.</td></tr>`;
+
+            const modal = document.getElementById('modal-todo-comodato');
+            const content = document.getElementById('modal-todo-comodato-content');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        }
+
+        function cerrarModalTodoComodato() {
+            const modal = document.getElementById('modal-todo-comodato');
+            const content = document.getElementById('modal-todo-comodato-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+        }
+
         function formatDateStr(dateStr) {
             if(!dateStr || dateStr === 'Nunca' || dateStr === '-') return dateStr;
             const parts = String(dateStr).split('-');
@@ -2244,6 +3590,397 @@ function doGet(e) {
             return `${parts[2]} ${months[parseInt(parts[1]) - 1]} ${parts[0]}`;
         }
         
+        function timeStrToMinutes(str) {
+            if (!str) return null;
+            const m = String(str).match(/^(\d{1,2}):(\d{2})/);
+            if (!m) return null;
+            return (parseInt(m[1]) * 60) + parseInt(m[2]);
+        }
+
+        function parseHoraParts(str) {
+            if (!str) return null;
+            const m = String(str).match(/^(\d{1,2}):(\d{2})/);
+            if (!m) return null;
+            return { h: parseInt(m[1]), m: parseInt(m[2]) };
+        }
+
+        // Calcula la duración exacta en horas de una visita, considerando fecha de inicio,
+        // hora de inicio, fecha de fin y hora de fin (soporta visitas que cruzan de un día a otro).
+        function calcularDuracionHoras(fechaIni, horaIni, fechaFin, horaFin) {
+            const ini = parseHoraParts(horaIni);
+            const fin = parseHoraParts(horaFin);
+            if (!ini || !fin) return null;
+
+            const fIniStr = fechaIni || fechaFin;
+            const fFinStr = fechaFin || fechaIni;
+            if (!fIniStr || !fFinStr) return null;
+
+            const pIni = fIniStr.split('-').map(Number);
+            const pFin = fFinStr.split('-').map(Number);
+            if (pIni.length < 3 || pFin.length < 3 || pIni.some(isNaN) || pFin.some(isNaN)) return null;
+
+            const dtIni = new Date(pIni[0], pIni[1] - 1, pIni[2], ini.h, ini.m, 0);
+            const dtFin = new Date(pFin[0], pFin[1] - 1, pFin[2], fin.h, fin.m, 0);
+
+            const diffMs = dtFin - dtIni;
+            if (diffMs <= 0) return null;
+            return diffMs / (1000 * 60 * 60);
+        }
+
+        function populateReporteMantoYearFilter() {
+            const sel = document.getElementById('rm-year-filter');
+            if (!sel) return;
+            const currentVal = sel.value || 'TODOS';
+            const years = new Set();
+            dataMantenimientoFull.forEach(m => { if (m.fecha) years.add(m.fecha.substring(0, 4)); });
+            dataProgramacionFull.forEach(p => { if (p.fecha) years.add(p.fecha.substring(0, 4)); });
+            const sortedYears = Array.from(years).filter(y => /^\d{4}$/.test(y)).sort((a, b) => b - a);
+
+            sel.innerHTML = '<option value="TODOS">Todos los años</option>' +
+                sortedYears.map(y => `<option value="${y}">${y}</option>`).join('');
+
+            if (sortedYears.includes(currentVal) || currentVal === 'TODOS') {
+                sel.value = currentVal;
+            } else {
+                sel.value = 'TODOS';
+            }
+        }
+
+        function renderReporteMantenimiento() {
+            if (typeof Chart === 'undefined') return;
+            const yearSel = document.getElementById('rm-year-filter');
+            const yearFilter = yearSel ? yearSel.value : 'TODOS';
+            const monthSel = document.getElementById('rm-month-filter');
+            const monthFilter = monthSel ? monthSel.value : 'TODOS';
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#cbd5e1' : '#475569';
+            const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+            const tooltipCfg = {
+                backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                titleColor: isDark ? '#f8fafc' : '#0f172a',
+                bodyColor: isDark ? '#cbd5e1' : '#475569',
+                borderColor: isDark ? '#334155' : '#e2e8f0',
+                borderWidth: 1
+            };
+            const palette = ['#2b6cb0', '#d69e2e', '#38a169', '#805ad5', '#e53e3e', '#0891b2', '#db2777', '#65a30d', '#ea580c', '#4338ca'];
+
+            // Base de conteo de "mantenimientos": registros (visitas) de la tabla PROGRAMACION, Estado = REALIZADO.
+            const fechaCoincide = (fecha) => {
+                if (!fecha) return false;
+                const okYear = yearFilter === 'TODOS' || fecha.substring(0, 4) === yearFilter;
+                const okMonth = monthFilter === 'TODOS' || fecha.substring(5, 7) === monthFilter;
+                return okYear && okMonth;
+            };
+            // Por defecto se excluye SPARTAN CHEMICAL PERU SAC (salvo botón activado) y se incluye SODEXO (salvo botón desactivado).
+            // (clienteVisible ahora es una función global definida arriba, reutilizada también por abrirModalComodato)
+            const progRealizado = dataProgramacionFull.filter(p => p.estado === 'REALIZADO' && fechaCoincide(p.fecha) && clienteVisible(p.cliente));
+            const progCancelado = dataProgramacionFull.filter(p => p.estado === 'CANCELADO' && fechaCoincide(p.fecha) && clienteVisible(p.cliente));
+            // La tabla MANTENIMIENTO se usa solo para el estado operativo/inoperativo de los equipos (dato que no existe en PROGRAMACION).
+            // La tabla MANTENIMIENTO ya no se usa en esta vista (se eliminaron los gráficos de Estado Final de Equipos y Top Técnicos).
+
+            // ---- KPIs ----
+            const clientesUnicos = new Set(progRealizado.map(p => p.cliente).filter(c => c));
+            let horasTotales = 0;
+            let visitasConHoras = 0;
+            const horasPorCliente = {};
+            progRealizado.forEach(p => {
+                const horas = calcularDuracionHoras(p.fecha, p.horaInicio, p.fechaFin, p.horaFin);
+                if (horas === null) return;
+                horasTotales += horas;
+                visitasConHoras++;
+                horasPorCliente[p.cliente] = (horasPorCliente[p.cliente] || 0) + horas;
+            });
+            const promedioHoras = visitasConHoras > 0 ? (horasTotales / visitasConHoras) : 0;
+
+            document.getElementById('rm-kpi-total').innerText = progRealizado.length;
+            document.getElementById('rm-kpi-clientes').innerText = clientesUnicos.size;
+            document.getElementById('rm-kpi-horas').innerText = horasTotales.toFixed(0) + 'h';
+            document.getElementById('rm-kpi-promedio').innerText = promedioHoras.toFixed(1) + 'h';
+            document.getElementById('rm-kpi-canceladas').innerText = progCancelado.length;
+
+            const cumplimiento = calcularCumplimientoVisitas();
+            document.getElementById('rm-kpi-cumplimiento').innerText = cumplimiento.pctGeneral.toFixed(0) + '%';
+
+            // ---- Top clientes atendidos (por N° de mantenimientos/visitas REALIZADO en PROGRAMACION) ----
+            const conteoClientes = {};
+            progRealizado.forEach(p => { if (p.cliente) conteoClientes[p.cliente] = (conteoClientes[p.cliente] || 0) + 1; });
+            const topClientes = Object.entries(conteoClientes).sort((a, b) => b[1] - a[1]).slice(0, 10);
+
+            if (rmTopClientesChartInstance) rmTopClientesChartInstance.destroy();
+            rmTopClientesChartInstance = new Chart(document.getElementById('rmTopClientesChart'), {
+                type: 'bar',
+                data: {
+                    labels: topClientes.map(c => c[0]),
+                    datasets: [{ label: 'Mantenimientos', data: topClientes.map(c => c[1]), backgroundColor: '#d69e2e', borderRadius: 4 }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (evt, elements, chart) => {
+                        if (elements && elements.length > 0) {
+                            const item = topClientes[elements[0].index];
+                            if (item) abrirModalTipoVisita(item[0]);
+                        }
+                    },
+                    onHover: (evt, elements, chart) => {
+                        chart.canvas.style.cursor = (elements && elements.length > 0) ? 'pointer' : 'default';
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { ...tooltipCfg, callbacks: { afterBody: () => ['', 'Clic para ver detalle'] } }
+                    },
+                    scales: {
+                        x: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor, stepSize: 1, font: { size: 10 } } },
+                        y: { grid: { display: false }, ticks: { color: textColor, font: { size: 10, weight: 'bold' } } }
+                    }
+                }
+            });
+
+            // ---- Tipos de mantenimiento (TipoVisita en PROGRAMACION) ----
+            const conteoTipos = {};
+            progRealizado.forEach(p => { const t = p.tipoVisita || 'SIN ESPECIFICAR'; conteoTipos[t] = (conteoTipos[t] || 0) + 1; });
+            const tipos = Object.entries(conteoTipos).sort((a, b) => b[1] - a[1]);
+            const totalTipos = tipos.reduce((s, t) => s + t[1], 0);
+
+            if (rmTipoMantoChartInstance) rmTipoMantoChartInstance.destroy();
+            rmTipoMantoChartInstance = new Chart(document.getElementById('rmTipoMantoChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: tipos.map(t => t[0]),
+                    datasets: [{ data: tipos.map(t => t[1]), backgroundColor: palette, borderColor: isDark ? '#1e293b' : '#ffffff', borderWidth: 2 }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            ...tooltipCfg,
+                            callbacks: {
+                                label: (ctx) => {
+                                    const pct = totalTipos > 0 ? (ctx.raw / totalTipos * 100).toFixed(1) : 0;
+                                    return `${ctx.label}: ${ctx.raw} (${pct}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const tipoMantoTbody = document.getElementById('rm-tipomanto-tbody');
+            if (tipoMantoTbody) {
+                tipoMantoTbody.innerHTML = tipos.map((t, i) => {
+                    const pct = totalTipos > 0 ? (t[1] / totalTipos * 100) : 0;
+                    const color = palette[i % palette.length];
+                    return `
+                        <tr>
+                            <td class="py-1.5 pr-2 text-slate-700 dark:text-slate-200 font-medium">
+                                <span class="inline-block w-2.5 h-2.5 rounded-full mr-1.5 align-middle" style="background-color:${color};"></span>${t[0]}
+                            </td>
+                            <td class="py-1.5 pr-2 text-center text-slate-600 dark:text-slate-300">${t[1]}</td>
+                            <td class="py-1.5 text-right text-slate-800 dark:text-slate-100 font-semibold">${pct.toFixed(1)}%</td>
+                        </tr>
+                    `;
+                }).join('') || `<tr><td colspan="3" class="py-4 text-center text-slate-400 dark:text-slate-500">Sin datos</td></tr>`;
+            }
+
+            // ---- Horas de visita por cliente ----
+            const topHoras = Object.entries(horasPorCliente).sort((a, b) => b[1] - a[1]).slice(0, 10);
+
+            if (rmHorasClienteChartInstance) rmHorasClienteChartInstance.destroy();
+            rmHorasClienteChartInstance = new Chart(document.getElementById('rmHorasClienteChart'), {
+                type: 'bar',
+                data: {
+                    labels: topHoras.map(c => c[0]),
+                    datasets: [{ label: 'Horas', data: topHoras.map(c => Number(c[1].toFixed(1))), backgroundColor: '#38a169', borderRadius: 4 }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: tooltipCfg },
+                    scales: {
+                        x: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor, font: { size: 10 } } },
+                        y: { grid: { display: false }, ticks: { color: textColor, font: { size: 10, weight: 'bold' } } }
+                    }
+                }
+            });
+
+            // ---- Mantenimientos por mes / por día (visitas REALIZADO en PROGRAMACION) ----
+            const tituloMantoMensual = document.getElementById('rmMantoMensualTitle');
+            let mantoMensualLabels, mantoMensualData, mantoMensualLegendLabel;
+
+            if (monthFilter !== 'TODOS') {
+                // Vista por día del mes seleccionado
+                const diasEnMes = (yearFilter !== 'TODOS')
+                    ? new Date(parseInt(yearFilter), parseInt(monthFilter), 0).getDate()
+                    : ({'01':31,'02':29,'03':31,'04':30,'05':31,'06':30,'07':31,'08':31,'09':30,'10':31,'11':30,'12':31})[monthFilter];
+
+                mantoMensualLabels = Array.from({ length: diasEnMes }, (_, i) => String(i + 1));
+                mantoMensualData = Array(diasEnMes).fill(0);
+                progRealizado.forEach(p => {
+                    if (!p.fecha) return;
+                    const parts = p.fecha.split('-');
+                    if (parts.length < 3) return;
+                    const dayIdx = parseInt(parts[2]) - 1;
+                    if (dayIdx >= 0 && dayIdx < diasEnMes) mantoMensualData[dayIdx]++;
+                });
+                mantoMensualLegendLabel = 'Mantenimientos por día';
+                if (tituloMantoMensual) tituloMantoMensual.innerText = 'Visitas por Día';
+            } else {
+                // Vista por mes (Ene-Dic)
+                const mesesLabels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+                const mantoPorMes = Array(12).fill(0);
+                progRealizado.forEach(p => {
+                    if (!p.fecha) return;
+                    const parts = p.fecha.split('-');
+                    if (parts.length < 2) return;
+                    const monthIdx = parseInt(parts[1]) - 1;
+                    if (monthIdx >= 0 && monthIdx < 12) mantoPorMes[monthIdx]++;
+                });
+                mantoMensualLabels = mesesLabels;
+                mantoMensualData = mantoPorMes;
+                mantoMensualLegendLabel = 'Mantenimientos';
+                if (tituloMantoMensual) tituloMantoMensual.innerText = 'Visitas por Mes';
+            }
+
+            if (rmMantoMensualChartInstance) rmMantoMensualChartInstance.destroy();
+            rmMantoMensualChartInstance = new Chart(document.getElementById('rmMantoMensualChart'), {
+                type: 'bar',
+                data: {
+                    labels: mantoMensualLabels,
+                    datasets: [{ label: mantoMensualLegendLabel, data: mantoMensualData, backgroundColor: '#805ad5', borderRadius: 4 }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: tooltipCfg },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor, stepSize: 1, font: { size: 10 } } },
+                        x: { grid: { display: false }, ticks: { color: textColor, font: { size: 10, weight: 'bold' } } }
+                    }
+                }
+            });
+
+            // ---- Top clientes con mayor consumo (REQUERIMIENTO + DETALLE_REQ, cruzando con SEDES para viático y mano de obra) ----
+            const reqFiltrados = dataRequerimientoFull.filter(r => fechaCoincide(r.fecha) && clienteVisible(r.cliente));
+            const consumoPorCliente = {}; // { cliente: { repuestos: n, costoVisitas: n } }
+            reqFiltrados.forEach(req => {
+                if (!req.cliente) return;
+                const detalles = dataDetalleReqFull.filter(d => d.idReq === req.idReq);
+                const costoRepuestos = detalles.reduce((sum, d) => sum + (d.costoUnitario * d.cantidad), 0);
+
+                const sedeInfo = dataSedesExtendida.find(s => s.cliente === req.cliente && s.sede === req.sede);
+                const costoVisita = sedeInfo ? ((sedeInfo.manObra || 0) + (sedeInfo.viatico || 0)) : 0;
+
+                if (!consumoPorCliente[req.cliente]) consumoPorCliente[req.cliente] = { repuestos: 0, costoVisitas: 0 };
+                consumoPorCliente[req.cliente].repuestos += costoRepuestos;
+                consumoPorCliente[req.cliente].costoVisitas += costoVisita;
+            });
+
+            const topConsumo = Object.entries(consumoPorCliente)
+                .map(([cliente, v]) => ({ cliente, repuestos: v.repuestos, costoVisitas: v.costoVisitas, total: v.repuestos + v.costoVisitas }))
+                .sort((a, b) => b.total - a.total)
+                .slice(0, 10);
+
+            if (rmTopRepuestosChartInstance) rmTopRepuestosChartInstance.destroy();
+            rmTopRepuestosChartInstance = new Chart(document.getElementById('rmTopRepuestosChart'), {
+                type: 'bar',
+                data: {
+                    labels: topConsumo.map(c => c.cliente),
+                    datasets: [
+                        { label: 'Repuestos', data: topConsumo.map(c => Number(c.repuestos.toFixed(2))), backgroundColor: '#0891b2', borderRadius: 4 },
+                        { label: 'Viático + Mano de Obra', data: topConsumo.map(c => Number(c.costoVisitas.toFixed(2))), backgroundColor: '#f59e0b', borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (evt, elements, chart) => {
+                        if (elements && elements.length > 0) {
+                            const item = topConsumo[elements[0].index];
+                            if (item) abrirModalRepuestos(item.cliente);
+                        }
+                    },
+                    onHover: (evt, elements, chart) => {
+                        chart.canvas.style.cursor = (elements && elements.length > 0) ? 'pointer' : 'default';
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: textColor, font: { size: 10 }, boxWidth: 12, padding: 10 } },
+                        tooltip: {
+                            ...tooltipCfg,
+                            callbacks: {
+                                label: (ctx) => `${ctx.dataset.label}: S/ ${ctx.raw.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                                afterBody: () => ['', 'Clic para ver detalle']
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { stacked: true, beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor, font: { size: 10 }, callback: (v) => 'S/ ' + v } },
+                        y: { stacked: true, grid: { display: false }, ticks: { color: textColor, font: { size: 10, weight: 'bold' } } }
+                    }
+                }
+            });
+
+            // ---- Equipos entregados en comodato por cliente (COMODATO cruzado con EQUIPOS para el precio, en USD; sin filtro de fechas) ----
+            const comodatoFiltrado = dataComodatoFull.filter(c => clienteVisible(c.cliente));
+            const comodatoPorCliente = {}; // { cliente: { cantidad: n, costoTotal: n } }
+            comodatoFiltrado.forEach(c => {
+                if (!c.cliente) return;
+                if (!comodatoPorCliente[c.cliente]) comodatoPorCliente[c.cliente] = { cantidad: 0, costoTotal: 0 };
+                comodatoPorCliente[c.cliente].cantidad += 1;
+                comodatoPorCliente[c.cliente].costoTotal += (c.costo || 0);
+            });
+
+            const topComodato = Object.entries(comodatoPorCliente)
+                .map(([cliente, v]) => ({ cliente, cantidad: v.cantidad, costoTotal: v.costoTotal }))
+                .sort((a, b) => b.costoTotal - a.costoTotal)
+                .slice(0, 10);
+
+            if (rmComodatoChartInstance) rmComodatoChartInstance.destroy();
+            rmComodatoChartInstance = new Chart(document.getElementById('rmComodatoChart'), {
+                type: 'bar',
+                data: {
+                    labels: topComodato.map(c => c.cliente),
+                    datasets: [
+                        { label: 'Inversión en Comodato (USD)', data: topComodato.map(c => Number(c.costoTotal.toFixed(2))), backgroundColor: '#4338ca', borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (evt, elements, chart) => {
+                        if (elements && elements.length > 0) {
+                            const item = topComodato[elements[0].index];
+                            if (item) abrirModalComodato(item.cliente);
+                        }
+                    },
+                    onHover: (evt, elements, chart) => {
+                        chart.canvas.style.cursor = (elements && elements.length > 0) ? 'pointer' : 'default';
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            ...tooltipCfg,
+                            callbacks: {
+                                label: (ctx) => {
+                                    const item = topComodato[ctx.dataIndex];
+                                    return [`Inversión total: $ ${ctx.raw.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, `Equipos: ${item.cantidad}`, 'Clic para ver detalle'];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor, font: { size: 10 }, callback: (v) => '$' + v.toLocaleString('en-US') } },
+                        y: { grid: { display: false }, ticks: { color: textColor, font: { size: 10, weight: 'bold' } } }
+                    }
+                }
+            });
+        }
+
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById(`tab-${tabId}`).classList.add('active');
@@ -2274,11 +4011,17 @@ function doGet(e) {
                 kanban: { title: "Kanban de Prioridades", sub: "Visualización rápida de estado de visitas" },
                 cal_proy: { title: "Calendario Proyectado", sub: "Próximos vencimientos de visitas (Solo DispEquipos=SI)" },
                 cal_tec: { title: "Calendario de Técnicos", sub: "Seguimiento diario e historial por personal" },
+                reporte_manto: { title: "Reporte de Mantenimiento", sub: "Análisis estadístico de mantenimientos y visitas realizadas" },
                 api: { title: "Conexión AppSheet", sub: "Configuración y estructura de base de datos" }
             };
             if(titles[tabId]) {
                 document.getElementById('page-title').innerText = titles[tabId].title;
                 document.getElementById('page-subtitle').innerText = titles[tabId].sub;
+            }
+
+            if (tabId === 'reporte_manto') {
+                populateReporteMantoYearFilter();
+                renderReporteMantenimiento();
             }
 
             const isMobile = window.innerWidth < 768;
